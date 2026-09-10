@@ -1,0 +1,9 @@
+{
+  "name": "ROSPlus",
+  "short_name": "ROSPlus",
+  "description": "The performance layer for ROS 2.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f3ef",
+  "theme_color": "#0c1530"
+}

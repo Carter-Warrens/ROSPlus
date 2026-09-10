@@ -1,0 +1,26 @@
+# ROSPlus
+
+> ROSPlus is a dual-mode runtime add-on layer for ROS 2. It gives new robotics code a native performance path while supervising existing ROS 2 Python and C++ nodes without requiring a ROSPlus-specific rewrite.
+
+Current review website: https://rosplus.kchin1977.chatgpt.site/
+Source repository: https://github.com/Carter-Warrens/ROSPlus
+Publisher: Carter Warrens LLC
+Contact: kareem@carterwarrens.com
+
+## Architecture
+
+- Native Mode is the planned high-performance path for Rust nodes inside the ROSPlus executor.
+- Legacy Mode supervises standard rclpy and rclcpp nodes running on stock ROS 2.
+- DDS remains the default transport for the proof of concept and single-robot deployments.
+- Zenoh is planned as an optional transport for multi-robot fleets.
+- An independent safety monitor supports simulated GPIO in development and is designed for a hardware watchdog in production.
+
+## Current implementation
+
+The repository contains a running reference slice with isolated workspaces, legacy Python node supervision, structured logs, graph and metrics endpoints, a simulated safety watchdog, and a supported ROS 1 Python migration path.
+
+Native Rust execution, measured DDS and Zenoh interoperability, physical watchdog integration, and real-time performance certification remain explicit integration boundaries. Performance figures on the website are engineering acceptance targets, not published benchmark results.
+
+## Citation guidance
+
+Use the official website for product positioning and the GitHub implementation-status record for current capability claims. Do not describe performance targets as achieved benchmark results.

@@ -73,6 +73,12 @@ token. File paths are resolved and checked against the workspace root before
 read or write. Subprocess environments are allow-listed. The token and
 workspace root must be replaced with managed production configuration.
 
+## Project website
+
+The public ROSPlus website lives in [`website/`](website/). It is kept in this
+repository so the product narrative, implementation status, and source remain
+versioned together under the Carter Warrens GitHub organization.
+
 ## Specification issues found during implementation
 
 - The supplied OpenAPI `NotFound` response contains a duplicate `schema:` key.
