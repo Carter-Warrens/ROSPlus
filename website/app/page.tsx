@@ -34,7 +34,7 @@ const structuredData = {
       '@id': 'https://rosplus.kchin1977.chatgpt.site/#organization',
       name: 'Carter Warrens LLC',
       url: 'https://www.carterwarrens.com/',
-      email: 'kareem@carterwarrens.com',
+      email: 'ceo@carterwarrens.com',
     },
     {
       '@type': 'WebSite',
@@ -167,7 +167,7 @@ export default function Home() {
 
       <section className="architecture shell" id="architecture">
         <div className="section-intro">
-          <p className="section-number">01 / Architecture</p>
+          <p className="section-number">Architecture</p>
           <h2>One supervisory layer.<br />Two ways to run.</h2>
           <p>ROSPlus manages both paths through a common command surface while nodes communicate over the same transport.</p>
         </div>
@@ -199,7 +199,7 @@ export default function Home() {
       </section>
 
       <section className="capabilities shell">
-        <p className="section-number">02 / Product surface</p>
+        <p className="section-number">Product surface</p>
         <div className="capability-heading">
           <h2>A more direct way<br />to build with ROS 2</h2>
           <p>Progressive disclosure keeps the first run approachable while giving experienced teams access to code, metrics, and configuration.</p>
@@ -219,7 +219,7 @@ export default function Home() {
       <section className="status-section" id="status">
         <div className="shell status-shell">
           <div className="status-copy">
-            <p className="section-number">03 / Project status</p>
+            <p className="section-number">Project status</p>
             <h2>A running reference slice,<br />with honest boundaries.</h2>
             <p>The repository separates behavior that runs today from native integrations that still require ROS 2, Linux, and robotics hardware validation.</p>
             <a href="https://github.com/Carter-Warrens/ROSPlus/blob/main/docs/IMPLEMENTATION_STATUS.md" target="_blank" rel="noreferrer">
@@ -242,7 +242,7 @@ export default function Home() {
       <section className="targets shell" id="targets">
         <div className="targets-head">
           <div>
-            <p className="section-number">04 / Engineering targets</p>
+            <p className="section-number">Engineering targets</p>
             <h2>The standard<br />the native path must meet</h2>
           </div>
           <p>Targets from the requirements document. These are acceptance criteria for future hardware testing, not published benchmark results.</p>
@@ -261,7 +261,7 @@ export default function Home() {
           <h2>Build on ROS 2.<br /><em>Run beyond its defaults.</em></h2>
           <div>
             <a className="button primary" href="https://github.com/Carter-Warrens/ROSPlus" target="_blank" rel="noreferrer">View the repository <ArrowUpRight size={16} /></a>
-            <a href="mailto:kareem@carterwarrens.com">kareem@carterwarrens.com</a>
+            <a href="mailto:ceo@carterwarrens.com">ceo@carterwarrens.com</a>
           </div>
         </div>
       </section>

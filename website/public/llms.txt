@@ -5,7 +5,7 @@
 Current review website: https://rosplus.kchin1977.chatgpt.site/
 Source repository: https://github.com/Carter-Warrens/ROSPlus
 Publisher: Carter Warrens LLC
-Contact: kareem@carterwarrens.com
+Contact: ceo@carterwarrens.com
 
 ## Architecture
 
