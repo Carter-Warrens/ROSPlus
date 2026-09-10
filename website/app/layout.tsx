@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     'robot fleet management',
     'robotics developer tools',
   ],
-  metadataBase: new URL('https://rosplus.kchin1977.chatgpt.site'),
+  metadataBase: new URL('https://ros-plus.com'),
   alternates: { canonical: '/' },
   manifest: '/site.webmanifest',
   robots: {

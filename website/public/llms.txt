@@ -2,7 +2,7 @@
 
 > ROSPlus is a dual-mode runtime add-on layer for ROS 2. It gives new robotics code a native performance path while supervising existing ROS 2 Python and C++ nodes without requiring a ROSPlus-specific rewrite.
 
-Current review website: https://rosplus.kchin1977.chatgpt.site/
+Official website: https://ros-plus.com/
 Source repository: https://github.com/Carter-Warrens/ROSPlus
 Publisher: Carter Warrens LLC
 Contact: ceo@carterwarrens.com
