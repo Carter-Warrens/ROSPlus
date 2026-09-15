@@ -66,7 +66,7 @@ const capabilities = [
   {
     icon: Layers,
     title: 'Two execution paths',
-    text: 'Performance-critical Rust nodes use the native executor. Existing Python and C++ nodes keep stock ROS 2 behavior.',
+    text: 'ABI-v1 C and Rust plugins run through the native path. Existing Python and C++ nodes keep stock ROS 2 behavior.',
   },
   {
     icon: HeartPulse,
@@ -80,19 +80,42 @@ const capabilities = [
   },
 ];
 
-const current = [
-  'Isolated workspace lifecycle and secure file access',
-  'Legacy Python node supervision with structured logs',
-  'Graph, metrics, status, health, and Prometheus endpoints',
-  'Heartbeat watchdog with simulated GPIO E-Stop',
-  'ROS 1 Python publisher and subscriber migration path',
+const verified = [
+  {
+    label: 'Runtime & supervision',
+    detail: 'Native C/Rust plugins, stock C++/Python nodes, restarts, logs, metrics, and per-runtime progress monitoring.',
+  },
+  {
+    label: 'Migration compatibility',
+    detail: 'Recorded bag replay, custom message interfaces, C++, action sequencing with feedback, TF, timers, parameters, and services.',
+  },
+  {
+    label: 'Executor-linked safety',
+    detail: 'A stalled callback triggered the simulated, latched E-Stop in 66.547 ms—inside the 100 ms software acceptance limit.',
+  },
+  {
+    label: 'Repository quality gates',
+    detail: 'Rust tests, clippy, formatting, Go race tests, Python tests, frontend build, and all 14 OpenAPI paths passed.',
+  },
 ];
 
-const boundaries = [
-  'Native Rust executor and shared-memory transport',
-  'Measured DDS and Zenoh interoperability',
-  'Physical watchdog and motor relay integration',
-  'Real-time performance certification on target hardware',
+const remaining = [
+  {
+    label: 'Physical safety chain',
+    detail: 'Verify target controller GPIO/PWM, independent watchdog wiring, relay or motor power cutoff, and measurement equipment.',
+  },
+  {
+    label: 'Broader ROS compatibility',
+    detail: 'Automate C++, actionlib, and TF conversion; expand custom services/actions, nested interfaces, simulated time, nodelets, and dynamic reconfigure.',
+  },
+  {
+    label: 'Native runtime depth',
+    detail: 'Add arbitrary message, service, and action types; multi-endpoint plugins; process-shared pools; and protection from callbacks that never return.',
+  },
+  {
+    label: 'Production validation',
+    detail: 'Run larger workspaces and recorded bags, descendant-heavy process trees, prescribed hardware benchmarks, and the complete acceptance suite.',
+  },
 ];
 
 export default function Home() {
@@ -109,7 +132,7 @@ export default function Home() {
         </a>
         <div className="nav-links">
           <a href="#architecture">Architecture</a>
-          <a href="#status">Status</a>
+          <a href="#status">Test status</a>
           <a href="#targets">Targets</a>
         </div>
         <a className="nav-github" href="https://github.com/Carter-Warrens/ROSPlus" target="_blank" rel="noreferrer">
@@ -219,24 +242,63 @@ export default function Home() {
       <section className="status-section" id="status">
         <div className="shell status-shell">
           <div className="status-copy">
-            <p className="section-number">Project status</p>
-            <h2>A running reference slice,<br />with honest boundaries.</h2>
-            <p>The repository separates behavior that runs today from native integrations that still require ROS 2, Linux, and robotics hardware validation.</p>
-            <a href="https://github.com/Carter-Warrens/ROSPlus/blob/main/docs/IMPLEMENTATION_STATUS.md" target="_blank" rel="noreferrer">
-              Read the implementation record <ArrowUpRight size={15} />
-            </a>
-          </div>
-          <div className="status-ledger">
-            <div>
-              <p><span className="live-dot" /> Running in the reference slice</p>
-              <ul>{current.map(item => <li key={item}><Check size={15} />{item}</li>)}</ul>
+            <p className="section-number">Linux validation · September 2026</p>
+            <h2>Software paths tested.<br />Hardware proof remains.</h2>
+            <p>ROSPlus now has repeatable Linux evidence across native and legacy execution, migration scenarios, and executor-linked safety monitoring. Physical motor cutoff and production-scale validation are still required before safety or real-time claims can be made.</p>
+            <div className="status-links">
+              <a href="https://github.com/Carter-Warrens/ROSPlus/blob/main/docs/IMPLEMENTATION_STATUS.md" target="_blank" rel="noreferrer">
+                Implementation record <ArrowUpRight size={15} />
+              </a>
+              <a href="https://github.com/Carter-Warrens/ROSPlus/tree/main/reports" target="_blank" rel="noreferrer">
+                Test reports <ArrowUpRight size={15} />
+              </a>
             </div>
-            <div>
-              <p><span className="boundary-dot" /> Native integration boundary</p>
-              <ul>{boundaries.map(item => <li key={item}><span>○</span>{item}</li>)}</ul>
+          </div>
+          <div className="checkpoint" aria-label="Current validation checkpoint">
+            <div className="checkpoint-stat">
+              <span>Current checkpoint</span>
+              <strong>Software validated</strong>
+              <small>Physical safety pending</small>
+            </div>
+            <div className="checkpoint-measure">
+              <span>Stall → simulated E-Stop</span>
+              <strong>66.547 ms</strong>
+              <small>100 ms software limit</small>
             </div>
           </div>
         </div>
+
+        <div className="shell validation-grid">
+          <section className="validation-column verified-column" aria-labelledby="verified-heading">
+            <div className="validation-heading">
+              <span className="live-dot" />
+              <div><p>Verified in the Linux test environment</p><h3 id="verified-heading">What passes today</h3></div>
+            </div>
+            <ol>
+              {verified.map((item, index) => (
+                <li key={item.label}>
+                  <span>0{index + 1}</span>
+                  <div><strong>{item.label}</strong><p>{item.detail}</p></div>
+                </li>
+              ))}
+            </ol>
+          </section>
+          <section className="validation-column remaining-column" aria-labelledby="remaining-heading">
+            <div className="validation-heading">
+              <span className="boundary-dot" />
+              <div><p>Open validation and engineering work</p><h3 id="remaining-heading">What remains</h3></div>
+            </div>
+            <ol>
+              {remaining.map((item, index) => (
+                <li key={item.label}>
+                  <span>0{index + 1}</span>
+                  <div><strong>{item.label}</strong><p>{item.detail}</p></div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        </div>
+        <p className="shell evidence-note">Status reflects repository test artifacts generated on Linux. The 66.547 ms result uses simulated GPIO; it does not verify a physical relay or motor power cutoff.</p>
       </section>
 
       <section className="targets shell" id="targets">

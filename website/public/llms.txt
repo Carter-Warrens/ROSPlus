@@ -15,11 +15,11 @@ Contact: ceo@carterwarrens.com
 - Zenoh is planned as an optional transport for multi-robot fleets.
 - An independent safety monitor supports simulated GPIO in development and is designed for a hardware watchdog in production.
 
-## Current implementation
+## Current implementation and test status
 
-The repository contains a running reference slice with isolated workspaces, legacy Python node supervision, structured logs, graph and metrics endpoints, a simulated safety watchdog, and a supported ROS 1 Python migration path.
+The Linux validation suite passes native ABI-v1 C and Rust plugins, stock ROS 2 C++ and Python processes, runtime supervision, recorded bag replay, custom message interfaces, action sequencing with feedback, TF, timers, parameters, and services. Executor-linked monitoring triggered a simulated, latched E-Stop in 66.547 ms, inside the 100 ms software acceptance limit. Repository quality gates also pass across Rust, Go, Python, the frontend, and all 14 documented OpenAPI paths.
 
-Native Rust execution, measured DDS and Zenoh interoperability, physical watchdog integration, and real-time performance certification remain explicit integration boundaries. Performance figures on the website are engineering acceptance targets, not published benchmark results.
+Physical GPIO and PWM control, independent watchdog and relay wiring, motor power cutoff, broader automatic ROS migration, process-shared native runtime features, large production workloads, and target-hardware real-time certification remain open. The simulated E-Stop result is software evidence and must not be described as physical safety validation. Performance figures in the engineering-targets section remain acceptance criteria, not general benchmark claims.
 
 ## Citation guidance
 
