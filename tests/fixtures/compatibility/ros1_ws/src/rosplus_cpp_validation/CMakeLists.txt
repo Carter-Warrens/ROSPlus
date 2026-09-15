@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(rosplus_cpp_validation)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
+catkin_package()
+include_directories(${catkin_INCLUDE_DIRS})
+add_executable(cpp_processor ../../../migration_source/cpp_processor.cpp)
+target_link_libraries(cpp_processor ${catkin_LIBRARIES})

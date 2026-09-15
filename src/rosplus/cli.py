@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
         serve(args.host, args.port, args.root, args.token); return 0
     if args.command == "migrate":
         result = migrate_tree(args.source, args.output, not args.no_tests, args.dry_run)
-        print(json.dumps(result.public(), indent=2)); return 2 if result.status == "partial" else 0
+        print(json.dumps(result.public(), indent=2)); return 2 if result.status != "success" else 0
     if args.command == "safety-demo":
         gpio = GpioSimulator(args.log); monitor = SafetyMonitor(args.timeout_ms, gpio); monitor.start()
         end = time.monotonic() + args.duration

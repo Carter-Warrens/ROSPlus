@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = ["rosplus_core", "rosplus_safety", "rosplus_macros", "rosplus_plugin_api", "examples/native_rust_node"]
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+license = "Apache-2.0"
+[workspace.dependencies]
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+signal-hook = "0.3"
+rosplus_plugin_api = { path = "rosplus_plugin_api" }
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

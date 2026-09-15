@@ -25,7 +25,7 @@ class GpioSimulator:
 
 
 class SafetyMonitor:
-    """Independent heartbeat watchdog with a simulated hardware boundary."""
+    """Legacy in-process simulator. Use the Rust binary for process isolation."""
 
     def __init__(self, timeout_ms: int, gpio: GpioSimulator, on_estop: Callable[[], None] | None = None):
         if timeout_ms < 5:

@@ -1,0 +1,34 @@
+[
+  {
+    "test": "colcon_template_build",
+    "passed": true
+  },
+  {
+    "test": "native_to_legacy",
+    "passed": true,
+    "messages_observed": 5
+  },
+  {
+    "test": "plugin_to_legacy",
+    "passed": true,
+    "messages_observed": 5,
+    "abi": "v1-c",
+    "shutdown_callback_observed": true
+  },
+  {
+    "test": "rust_plugin_to_legacy",
+    "passed": true,
+    "messages_observed": 5,
+    "abi": "v1-rust"
+  },
+  {
+    "test": "legacy_to_native",
+    "passed": true,
+    "messages_observed": 5
+  },
+  {
+    "test": "stock_cpp_to_native",
+    "passed": true,
+    "messages_observed": 5
+  }
+]

@@ -1,0 +1,124 @@
+{
+  "scope": "same-host sequential comparison; one run per implementation, not a universal speed claim",
+  "results": {
+    "native": {
+      "benchmark": "dds_cross_process",
+      "clock": "CLOCK_MONOTONIC; endpoints must share the same host clock",
+      "cpu_load": {
+        "target_background_percent": 82,
+        "affinity_cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "workers": [
+          {
+            "cpu": 0,
+            "cpu_seconds": 10.067248563,
+            "wall_seconds": 12.45214264400056
+          },
+          {
+            "cpu": 2,
+            "cpu_seconds": 10.081722906000001,
+            "wall_seconds": 12.452823193001677
+          },
+          {
+            "cpu": 3,
+            "cpu_seconds": 10.091574567,
+            "wall_seconds": 12.452932072999829
+          },
+          {
+            "cpu": 1,
+            "cpu_seconds": 10.032724499999999,
+            "wall_seconds": 12.455724493996968
+          }
+        ],
+        "measured_background_percent": 80.84792293928717
+      },
+      "expected_messages": 10000,
+      "includes": "payload construction after timestamp, serialization, DDS, wake-up, deserialization and receive copy",
+      "latency_samples": 10000,
+      "max_latency_us": 526.249,
+      "p50_latency_us": 14.643,
+      "p95_latency_us": 32.513,
+      "p99_latency_us": 51.876,
+      "received_messages": 10000,
+      "scheduler": {
+        "cpu": null,
+        "memory_locked": false,
+        "policy": "soft_rt",
+        "warnings": []
+      },
+      "transport": "stock rcl/RMW std_msgs/msg/String",
+      "publisher": {
+        "configured_frequency_hz": 1000.0,
+        "duration_seconds": 10.000001909,
+        "event": "publisher_summary",
+        "messages": 10000,
+        "pacing_deadlines_missed": 0
+      },
+      "implementation": "native",
+      "message_size_bytes": 1024,
+      "configured_frequency_hz": 1000
+    },
+    "rclpy": {
+      "benchmark": "stock_rclpy_cross_process",
+      "transport": "stock rclpy/RMW std_msgs/msg/String",
+      "scheduler": {
+        "policy": "soft_rt",
+        "warnings": []
+      },
+      "expected_messages": 10000,
+      "received_messages": 10000,
+      "latency_samples": 10000,
+      "p50_latency_us": 41.872,
+      "p95_latency_us": 76.032,
+      "p99_latency_us": 106.939,
+      "max_latency_us": 349.596,
+      "clock": "CLOCK_MONOTONIC; same-host endpoints",
+      "includes": "payload construction after timestamp, serialization, DDS, stock executor dispatch and deserialization",
+      "publisher": {
+        "event": "publisher_summary",
+        "messages": 10000,
+        "duration_seconds": 10.000129067000671,
+        "configured_frequency_hz": 1000.0
+      },
+      "implementation": "rclpy",
+      "message_size_bytes": 1024,
+      "configured_frequency_hz": 1000,
+      "cpu_load": {
+        "target_background_percent": 82,
+        "affinity_cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "workers": [
+          {
+            "cpu": 0,
+            "cpu_seconds": 9.974036606999999,
+            "wall_seconds": 12.569920234000165
+          },
+          {
+            "cpu": 2,
+            "cpu_seconds": 9.457196202,
+            "wall_seconds": 12.573813959999825
+          },
+          {
+            "cpu": 1,
+            "cpu_seconds": 9.949412393,
+            "wall_seconds": 12.574928089998139
+          },
+          {
+            "cpu": 3,
+            "cpu_seconds": 9.965490106999999,
+            "wall_seconds": 12.577063206001185
+          }
+        ],
+        "measured_background_percent": 78.2295828858388
+      }
+    }
+  }
+}

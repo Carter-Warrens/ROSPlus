@@ -1,0 +1,48 @@
+{
+  "benchmark": "dds_cross_process",
+  "clock": "CLOCK_MONOTONIC; endpoints must share the same host clock",
+  "cpu_load": {
+    "target_background_percent": 80,
+    "affinity_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "workers": [
+      {
+        "cpu": 3,
+        "cpu_seconds": 9.863806130999999,
+        "wall_seconds": 12.468646180001087
+      },
+      {
+        "cpu": 0,
+        "cpu_seconds": 9.847984283999999,
+        "wall_seconds": 12.47095086400077
+      },
+      {
+        "cpu": 2,
+        "cpu_seconds": 9.871314468000001,
+        "wall_seconds": 12.473268968999037
+      },
+      {
+        "cpu": 1,
+        "cpu_seconds": 9.823726877999999,
+        "wall_seconds": 12.474360494001303
+      }
+    ],
+    "measured_background_percent": 78.99184217831825
+  },
+  "expected_messages": 10000,
+  "includes": "payload construction after timestamp, serialization, DDS, wake-up, deserialization and receive copy",
+  "latency_samples": 10000,
+  "max_latency_us": 5901.623,
+  "p50_latency_us": 47.766,
+  "p95_latency_us": 2400.614,
+  "p99_latency_us": 2935.079,
+  "received_messages": 10000,
+  "scheduler": "normal",
+  "transport": "stock rcl/RMW std_msgs/msg/String",
+  "message_size_bytes": 1024,
+  "configured_frequency_hz": 1000
+}

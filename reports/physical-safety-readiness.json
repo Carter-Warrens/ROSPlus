@@ -1,0 +1,31 @@
+{
+  "ready": false,
+  "checked_on": "2026-09-14",
+  "requirements": {
+    "hold_signal_hz": 1000,
+    "soft_rt_heartbeat_timeout_ms": 50,
+    "maximum_power_cut_ms": 100,
+    "monitor_crash_must_remove_power": true
+  },
+  "host_inventory": {
+    "gpio_character_devices": [],
+    "pwm_devices": [],
+    "serial_devices": [],
+    "gpio_tools_available": false
+  },
+  "software_inventory": {
+    "simulated_watchdog": true,
+    "executor_progress_link": true,
+    "physical_gpio_backend": false,
+    "safety_binary_behavior": "rejects operation unless --simulate is supplied"
+  },
+  "remaining_before_physical_test": [
+    "Select the target GPIO/PWM controller, output line, active polarity, and hardware watchdog/relay wiring.",
+    "Implement an opt-in physical backend while retaining simulation as the default.",
+    "Measure the hold signal with a logic analyzer under CPU and I/O load.",
+    "Remove executor heartbeats and verify relay power loss within 100 ms.",
+    "SIGKILL the safety monitor and verify hardware dead-man power loss without software assistance.",
+    "Repeat fault injection and record raw timestamps, signal traces, relay voltage, and pass/fail results."
+  ],
+  "claim": "Physical safety is unverified; no hardware safety claim is made."
+}

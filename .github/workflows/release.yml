@@ -1,0 +1,32 @@
+name: Build release candidates
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkg/go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: rustup toolchain install 1.98.1 --profile minimal
+      - run: make deps build
+      - run: |
+          cargo build --release --manifest-path crates/Cargo.toml
+          mkdir -p release
+          cp crates/target/release/rosplus-runtime crates/target/release/rosplus-safety release/
+          for target in linux darwin windows; do
+            ext=""; test "$target" != windows || ext=.exe
+            (cd pkg && CGO_ENABLED=0 GOOS="$target" GOARCH=amd64 go build -trimpath -o "../release/turbo-$target-amd64$ext" ./cmd/turbo)
+          done
+          cp -r frontend/dist release/web
+          cd release && sha256sum rosplus-* turbo-* > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rosplus-release-candidate
+          path: release/

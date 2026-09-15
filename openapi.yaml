@@ -1,0 +1,913 @@
+openapi: 3.1.0
+info:
+  title: ROSPlus Web-IDE API
+  version: 0.2.0
+  description: >-
+    REST API for the ROSPlus Web-IDE backend. Provides workspace management,
+
+    build scheduling, node execution, graph topology, and metrics.
+
+
+    WebSocket endpoints are documented separately in design.md (Boundary E).
+
+
+    Version 0.2 describes the local development service. Native transport
+    metrics may be null until measured. Workspaces execute trusted local code
+    and are not security sandboxes.
+  contact:
+    name: ROSPlus
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://{host}:{port}
+    description: Production (HTTPS required)
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "8443"
+security:
+  - BearerAuth: []
+tags:
+  - name: Health
+    description: Health check and system status
+  - name: Workspace
+    description: Workspace lifecycle management
+  - name: Files
+    description: Workspace file operations
+  - name: Build
+    description: Build workspace packages
+  - name: Run
+    description: Node execution and control
+  - name: Graph
+    description: Node graph topology
+  - name: Metrics
+    description: Runtime metrics and diagnostics
+  - name: Logs
+    description: Log streaming (WebSocket)
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns server health status. No authentication required.
+      security: []
+      operationId: getHealth
+      responses:
+        "200":
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+                      - degraded
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 0.1.0
+                  executor_connected:
+                    type: boolean
+                    description: True while every running native executor reports recent loop progress.
+                  safety_monitor_connected:
+                    type: boolean
+  /metrics:
+    get:
+      tags:
+        - Metrics
+      summary: Prometheus metrics endpoint
+      description: |
+        Returns runtime metrics in Prometheus text exposition format.
+        Requires the same bearer token as the local API.
+      operationId: getPrometheusMetrics
+      responses:
+        "200":
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: |
+                  # HELP rosplus_node_cpu_usage CPU usage per node
+                  # TYPE rosplus_node_cpu_usage gauge
+                  rosplus_node_cpu_usage{node="talker"} 12.5
+                  rosplus_node_cpu_usage{node="listener"} 3.2
+  /api/v1/workspace/create:
+    post:
+      tags:
+        - Workspace
+      summary: Create a new workspace
+      operationId: createWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkspaceRequest"
+      responses:
+        "201":
+          description: Workspace created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Workspace with this name already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Maximum workspace limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/workspace/{id}:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Workspace
+      summary: Get workspace details
+      operationId: getWorkspace
+      responses:
+        "200":
+          description: Workspace details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - Workspace
+      summary: Delete workspace
+      description: Stops all running nodes before deleting the workspace.
+      operationId: deleteWorkspace
+      responses:
+        "200":
+          description: Workspace deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Workspace deleted
+                  id:
+                    type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/status:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Workspace
+      summary: Get workspace status
+      operationId: getWorkspaceStatus
+      responses:
+        "200":
+          description: Workspace status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/files:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Files
+      summary: List workspace files
+      operationId: listFiles
+      parameters:
+        - name: path
+          in: query
+          description: Subdirectory path (default is workspace root)
+          schema:
+            type: string
+            default: .
+      responses:
+        "200":
+          description: File listing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FileEntry"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/file/{path}:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+      - name: path
+        in: path
+        required: true
+        description: File path relative to workspace root
+        schema:
+          type: string
+          example: src/talker.py
+    get:
+      tags:
+        - Files
+      summary: Get file contents
+      operationId: getFile
+      responses:
+        "200":
+          description: File contents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  content:
+                    type: string
+                  language:
+                    type: string
+                    enum:
+                      - python
+                      - rust
+                      - cpp
+                      - yaml
+                      - xml
+                      - json
+                      - toml
+                      - markdown
+                      - text
+                  size_bytes:
+                    type: integer
+                  last_modified:
+                    type: string
+                    format: date-time
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Files
+      summary: Save file contents
+      operationId: saveFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: File content to write
+      responses:
+        "200":
+          description: File saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  size_bytes:
+                    type: integer
+                  last_modified:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/build:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    post:
+      tags:
+        - Build
+      summary: Build workspace
+      operationId: buildWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuildRequest"
+      responses:
+        "200":
+          description: Build result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BuildResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Build already in progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/workspace/{id}/run:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    post:
+      tags:
+        - Run
+      summary: Run a node or launch file
+      operationId: runNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunRequest"
+      responses:
+        "200":
+          description: Node started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/stop:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    post:
+      tags:
+        - Run
+      summary: Stop running nodes
+      operationId: stopNode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_name:
+                  type: string
+                  description: Node name to stop. Empty string stops all nodes.
+                  default: ""
+      responses:
+        "200":
+          description: Node(s) stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  stopped:
+                    type: array
+                    items:
+                      type: string
+                  message:
+                    type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/graph:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Graph
+      summary: Get node graph topology
+      description: |
+        Returns the current node graph including all running nodes, their
+        topics, and the edges (connections) between them.
+      operationId: getGraph
+      responses:
+        "200":
+          description: Node graph
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Graph"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/metrics:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Metrics
+      summary: Get workspace runtime metrics
+      operationId: getWorkspaceMetrics
+      responses:
+        "200":
+          description: Runtime metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RuntimeMetrics"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/workspace/{id}/logs:
+    parameters:
+      - $ref: "#/components/parameters/WorkspaceId"
+    get:
+      tags:
+        - Logs
+      summary: WebSocket log stream
+      description: "Authenticated WebSocket stream, with GET JSON polling fallback.
+        Send a subscribe message with workspace_id. Browser clients supply token
+        in the first WebSocket message, never in the URL. Same-origin
+        connections only. Authentication must complete within 5 seconds.
+        Supported client messages: subscribe, unsubscribe. restart_node commands
+        are not implemented; use the REST stop/run endpoints."
+      operationId: streamLogs
+      responses:
+        "101":
+          description: WebSocket connection upgraded; authenticate using the first
+            subscribe message
+        "200":
+          description: Polling log snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/workspace:
+    get:
+      tags:
+        - Workspace
+      summary: List persisted workspaces
+      operationId: listWorkspaces
+      responses:
+        "200":
+          description: Workspace list
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - workspaces
+                properties:
+                  workspaces:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Workspace"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API token authentication
+  parameters:
+    WorkspaceId:
+      name: id
+      in: path
+      required: true
+      description: Workspace UUID
+      schema:
+        type: string
+        format: uuid
+        example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Workspace not found
+        code:
+          type: integer
+          example: 404
+        details:
+          type: string
+    CreateWorkspaceRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Human-readable workspace name
+          example: my_first_robot
+          minLength: 1
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9_-]+$
+        template:
+          type: string
+          description: Project template to use
+          enum:
+            - empty
+            - talker_listener
+            - camera
+          default: empty
+    Workspace:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        path:
+          type: string
+          description: Filesystem path on the server
+        status:
+          type: string
+          enum:
+            - idle
+            - building
+            - running
+            - error
+        created:
+          type: string
+          format: date-time
+        last_activity:
+          type: string
+          format: date-time
+        node_count:
+          type: integer
+    WorkspaceStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - idle
+            - building
+            - running
+            - error
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NodeInfo"
+        last_activity:
+          type: string
+          format: date-time
+        executor_mode:
+          type: string
+          enum:
+            - normal
+            - soft_rt
+            - hard_rt
+          description: Actual scheduling mode; normal means SCHED_FIFO is not active.
+    NodeInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: talker
+        status:
+          type: string
+          enum:
+            - running
+            - stopped
+            - error
+            - starting
+        mode:
+          type: string
+          enum:
+            - native
+            - legacy
+          description: Whether the node runs in Native or Legacy mode
+        pid:
+          type: integer
+          example: 12345
+        uptime_seconds:
+          type: number
+          example: 123.4
+        cpu_percent:
+          type:
+            - number
+            - "null"
+          example: 12.5
+        memory_mb:
+          type:
+            - number
+            - "null"
+          example: 45.2
+        restart_count:
+          type: integer
+          example: 0
+    FileEntry:
+      type: object
+      properties:
+        name:
+          type: string
+          example: talker.py
+        path:
+          type: string
+          example: src/talker.py
+        is_directory:
+          type: boolean
+        size_bytes:
+          type: integer
+        last_modified:
+          type: string
+          format: date-time
+    BuildRequest:
+      type: object
+      properties:
+        packages:
+          type: array
+          items:
+            type: string
+          description: Specific packages to build. Empty array builds all.
+          default: []
+        release:
+          type: boolean
+          description: Build in release mode
+          default: false
+    BuildResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        log:
+          type: string
+          description: Full build output
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        duration_seconds:
+          type: number
+          example: 2.3
+        packages_built:
+          type: integer
+    RunRequest:
+      type: object
+      required:
+        - target
+      properties:
+        target:
+          type: string
+          description: Python file, built executable, ros2:package:executable, a built-in
+            native endpoint, or native:plugin:PATH for a workspace-local ABI v1 .so.
+          example: native:plugin:target/release/librobot_controller.so
+        mode:
+          type: string
+          enum:
+            - auto
+            - native
+            - legacy
+          description: |
+            Execution mode. `auto` detects from file type
+            (Rust → native, Python/C++ → legacy).
+          default: auto
+        args:
+          type: array
+          items:
+            type: string
+          description: Command-line arguments passed to the node
+          default: []
+        background:
+          type: boolean
+          description: Reserved for CLI compatibility. The service supervises runs
+            asynchronously in all cases.
+          default: false
+        priority:
+          type: string
+          enum:
+            - critical
+            - high
+            - normal
+            - low
+            - background
+          description: Scheduling priority (Native Mode only)
+          default: normal
+        restart:
+          type: string
+          enum:
+            - never
+            - on-failure
+            - always
+          default: never
+        max_restarts:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
+    RunResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        node_name:
+          type: string
+        pid:
+          type: integer
+        mode:
+          type: string
+          enum:
+            - native
+            - legacy
+        log_url:
+          type: string
+          description: WebSocket URL for log streaming
+    Graph:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+    GraphNode:
+      type: object
+      properties:
+        id:
+          type: string
+          example: talker
+        label:
+          type: string
+          example: Talker
+        type:
+          type: string
+          enum:
+            - publisher
+            - subscriber
+            - service_server
+            - service_client
+            - action_server
+            - action_client
+            - safety_monitor
+        mode:
+          type: string
+          enum:
+            - native
+            - legacy
+        status:
+          type: string
+          enum:
+            - healthy
+            - warning
+            - error
+            - stopped
+        color:
+          type: string
+          enum:
+            - green
+            - yellow
+            - red
+            - gray
+    GraphEdge:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source node ID
+        target:
+          type: string
+          description: Target node ID
+        topic:
+          type: string
+          example: /chatter
+        message_type:
+          type: string
+          example: std_msgs/String
+        latency_us:
+          type: number
+          description: Current average latency in microseconds
+          example: 300
+    RuntimeMetrics:
+      type: object
+      properties:
+        total_nodes:
+          type: integer
+        native_nodes:
+          type: integer
+        legacy_nodes:
+          type: integer
+        running_nodes:
+          type: integer
+        avg_latency_us:
+          type:
+            - number
+            - "null"
+        p99_latency_us:
+          type:
+            - number
+            - "null"
+        total_messages:
+          type:
+            - integer
+            - "null"
+          format: int64
+        messages_per_second:
+          type:
+            - number
+            - "null"
+        missed_deadlines:
+          type:
+            - integer
+            - "null"
+          format: int64
+        shm_pool:
+          type:
+            - object
+            - "null"
+          properties:
+            total_chunks:
+              type: integer
+            used_chunks:
+              type: integer
+            chunk_size_bytes:
+              type: integer
+            spill_events:
+              type: integer
+        safety_monitor:
+          type: object
+          properties:
+            connected:
+              type: boolean
+            estop_triggered:
+              type:
+                - boolean
+                - "null"
+            heartbeat_latency_us:
+              type:
+                - number
+                - "null"
+            simulated:
+              type: boolean
+            scope:
+              type: string
+            executor_connected:
+              type: boolean
+              description: True when every running native executor has recent loop progress.
+            native_executor_count:
+              type: integer
+            executor_heartbeat_age_ms:
+              type:
+                - number
+                - "null"
+        executor_mode:
+          type: string
+          enum:
+            - normal
+            - soft_rt
+            - hard_rt
+          description: Actual scheduling mode; normal means SCHED_FIFO is not active.
+        measurement_status:
+          type: string

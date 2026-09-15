@@ -1,0 +1,11 @@
+[package]
+name = "rosplus_native_rust_example"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+rosplus_plugin_api.workspace = true

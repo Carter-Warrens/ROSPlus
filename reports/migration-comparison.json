@@ -1,0 +1,32 @@
+{
+  "test": "Go-generated ROS2 talker versus original ROS1 fixture",
+  "passed": true,
+  "messages_compared": 10,
+  "source_sha256": "2af853b9c676221673fd4e50cf7d185fcc5e54f55361acbd4ca5183427bd0d56",
+  "generated_sha256": "41a97b3a8ccd27d1a8026ab497b6969b6200ca18712720c25d7cbc62f0402209",
+  "ros1_messages": [
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello"
+  ],
+  "ros2_messages": [
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello",
+    "hello"
+  ],
+  "scope": "Constant-payload fixture only; no general migration, timing, or recorded-bag equivalence claim."
+}

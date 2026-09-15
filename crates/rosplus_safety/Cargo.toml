@@ -1,0 +1,10 @@
+[package]
+name = "rosplus_safety"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+serde_json.workspace = true
+[[bin]]
+name = "rosplus-safety"
+path = "src/main.rs"

@@ -8,3 +8,6 @@ dist/
 build/
 target/
 node_modules/
+
+.cache/
+release/

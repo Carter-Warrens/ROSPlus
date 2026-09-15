@@ -1,0 +1,7 @@
+FROM ros:noetic-ros-core@sha256:fd6279f04e51fa61201a791da9a156129941887b95b614ae0cec7865ef49de4f
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ros-noetic-actionlib-tutorials \
+    ros-noetic-message-generation \
+    ros-noetic-tf \
+    && rm -rf /var/lib/apt/lists/*

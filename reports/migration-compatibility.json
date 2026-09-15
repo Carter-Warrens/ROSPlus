@@ -1,0 +1,196 @@
+{
+  "passed": true,
+  "scope": "Recorded bags, custom interfaces, C++, actionlib/actions, TF, and migration classification",
+  "scenarios": [
+    {
+      "scenario": "recorded_bag",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "input_messages": [
+          "alpha",
+          "Beta 2",
+          "gamma"
+        ],
+        "recorded_output_messages": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ],
+        "expected": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ],
+        "passed": true
+      },
+      "ros2_behavior": {
+        "input_messages": [
+          "alpha",
+          "Beta 2",
+          "gamma"
+        ],
+        "recorded_output_messages": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ],
+        "expected": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ],
+        "passed": true
+      },
+      "migration_mode": "automatic"
+    },
+    {
+      "scenario": "custom_interface",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "messages": [
+          {
+            "sequence": 8,
+            "label": "MIXED CASE",
+            "samples": [
+              3.0,
+              -4.0,
+              0.5
+            ]
+          }
+        ]
+      },
+      "ros2_behavior": {
+        "messages": [
+          {
+            "sequence": 8,
+            "label": "MIXED CASE",
+            "samples": [
+              3.0,
+              -4.0,
+              0.5
+            ]
+          }
+        ]
+      },
+      "migration_mode": "automatic"
+    },
+    {
+      "scenario": "cpp",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "messages": [
+          "cpp:alpha",
+          "cpp:Beta 2"
+        ]
+      },
+      "ros2_behavior": {
+        "messages": [
+          "cpp:alpha",
+          "cpp:Beta 2"
+        ]
+      },
+      "migration_mode": "manual paired port"
+    },
+    {
+      "scenario": "action",
+      "passed": true,
+      "comparison": "exact durable result sequence and feedback observed on both transports",
+      "ros1_behavior": {
+        "sequence": [
+          0,
+          1,
+          1,
+          2,
+          3,
+          5,
+          8,
+          13
+        ],
+        "feedback_count": 6
+      },
+      "ros2_behavior": {
+        "sequence": [
+          0,
+          1,
+          1,
+          2,
+          3,
+          5,
+          8,
+          13
+        ],
+        "feedback_count": 6
+      },
+      "migration_mode": "manual paired port"
+    },
+    {
+      "scenario": "tf",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "translation": [
+          1.25,
+          -2.5,
+          0.75
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "ros2_behavior": {
+        "translation": [
+          1.25,
+          -2.5,
+          0.75
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "migration_mode": "manual paired port"
+    }
+  ],
+  "classification_checks": {
+    "cpp_manual": true,
+    "actionlib_manual": true,
+    "tf_manual": true,
+    "migration_status_partial": true
+  },
+  "migration_result": {
+    "files_scanned": 5,
+    "files_migrated": 2,
+    "files_manual": 3,
+    "files_copied": 0,
+    "warnings": [
+      "action_server.py: unsupported ROS 1 dependency actionlib remains",
+      "cpp_processor.cpp: ROS 1 C++ source requires manual roscpp-to-rclcpp migration",
+      "tf_broadcaster.py: unconverted rospy reference or binding remains",
+      "tf_broadcaster.py: unsupported ROS 1 dependency tf remains"
+    ],
+    "outputs": [
+      "/home/kay-chin-alienware/Documents/Codex/2026-09-14/we-x20/outputs/rosplus/build/migration-compatibility/generated/action_server.py",
+      "/home/kay-chin-alienware/Documents/Codex/2026-09-14/we-x20/outputs/rosplus/build/migration-compatibility/generated/bag_processor.py",
+      "/home/kay-chin-alienware/Documents/Codex/2026-09-14/we-x20/outputs/rosplus/build/migration-compatibility/generated/cpp_processor.cpp",
+      "/home/kay-chin-alienware/Documents/Codex/2026-09-14/we-x20/outputs/rosplus/build/migration-compatibility/generated/custom_processor.py",
+      "/home/kay-chin-alienware/Documents/Codex/2026-09-14/we-x20/outputs/rosplus/build/migration-compatibility/generated/tf_broadcaster.py"
+    ],
+    "status": "partial",
+    "validation": "not_run"
+  },
+  "limitations": [
+    "C++, actionlib, and TF were behavior-tested as explicit manual ROS 2 ports; the converter correctly classifies their ROS 1 sources as manual.",
+    "Custom-interface automatic conversion covers one message with scalar, string, and variable-length array fields.",
+    "Bag validation uses equivalent native ROS 1 and ROS 2 bag formats with the same canonical String dataset.",
+    "Custom services/actions, nested interface packages, rosbag format conversion, nodelets, dynamic_reconfigure, simulated time, and large production workspaces remain outside this corpus.",
+    "Physical GPIO, relay, PWM, motor-power cutoff, and target-hardware timing require connected hardware and are not exercised here."
+  ]
+}

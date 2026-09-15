@@ -52,9 +52,10 @@ class MigrationTests(unittest.TestCase):
         fixture = Path(__file__).parent / "fixtures/ros1_workspace"
         with tempfile.TemporaryDirectory() as d:
             output = Path(d); result = migrate_tree(fixture, output)
-            self.assertEqual(result.status, "success")
+            self.assertEqual(result.status, "unvalidated")
             generated = (output / "talker.py").read_text()
             self.assertIn("import rclpy", generated)
+            self.assertIn("String(data='hello')", generated)
             self.assertIn("create_publisher", generated)
             self.assertTrue((output / "migration_result.json").exists())
 

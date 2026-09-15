@@ -1,0 +1,35 @@
+name: ROSPlus verification
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkg/go.mod
+          cache-dependency-path: pkg/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: rustup toolchain install 1.98.1 --profile minimal --component clippy --component rustfmt
+      - run: make deps test
+      - name: Live API contract test
+        shell: bash
+        env:
+          ROSPLUS_API_TOKEN: ci-disposable-local-token
+        run: |
+          ./build/turbo serve --root "$RUNNER_TEMP/rosplus" &
+          service_pid=$!
+          trap 'kill -INT "$service_pid"; wait "$service_pid" || true' EXIT
+          for attempt in {1..50}; do curl -fsS http://127.0.0.1:8080/health && break || sleep 0.1; done
+          node tooling/contract-test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: build/test-results.xml

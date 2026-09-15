@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rosplus_cpp_validation</name>
+  <version>0.1.0</version>
+  <description>ROSPlus ROS 2 C++ migration fixture.</description>
+  <maintainer email="validation@example.invalid">ROSPlus validation</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+</package>

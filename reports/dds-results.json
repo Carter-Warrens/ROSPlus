@@ -1,0 +1,23 @@
+{
+  "transport": "stock ROS 2 rcl/RMW, std_msgs/msg/String",
+  "tests": [
+    {
+      "test": "rust_to_stock_python",
+      "passed": true,
+      "messages_observed": 100,
+      "duration_seconds": 3.607
+    },
+    {
+      "test": "stock_cpp_to_rust",
+      "passed": true,
+      "messages_observed": 5,
+      "duration_seconds": 5.71
+    },
+    {
+      "test": "rust_to_rust",
+      "passed": true,
+      "messages_observed": 100,
+      "duration_seconds": 3.605
+    }
+  ]
+}

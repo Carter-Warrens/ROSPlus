@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "scope": "Live behavior comparison for three bounded Python rospy migration fixtures",
+  "scenarios": [
+    {
+      "scenario": "timer_parameter",
+      "passed": true,
+      "comparison": "same validated parameter and five consecutive timer counters; startup counters may differ during graph discovery",
+      "ros1_behavior": {
+        "messages": [
+          "validated:1",
+          "validated:2",
+          "validated:3",
+          "validated:4",
+          "validated:5"
+        ]
+      },
+      "generated_ros2_behavior": {
+        "messages": [
+          "validated:1",
+          "validated:2",
+          "validated:3",
+          "validated:4",
+          "validated:5"
+        ]
+      },
+      "source_sha256": "492bfc80e56325b8206e479c3e397d0f4464d779ffa6631ffb8e39c06f369a1a",
+      "generated_sha256": "b29ec6eb50807f4af8ad840e43484262270d1aca2bab1fa3868ee2f7ae9031f4"
+    },
+    {
+      "scenario": "subscriber_callback",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "messages": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ]
+      },
+      "generated_ros2_behavior": {
+        "messages": [
+          "ALPHA:seen",
+          "BETA 2:seen",
+          "GAMMA:seen"
+        ]
+      },
+      "source_sha256": "85c4049c43105a1d0c7d95141abd13367bdca36958e88dd5ac42961b31156ad4",
+      "generated_sha256": "f28625021bbd48061cece4b9d4b64c1d7eb005bfe5b4a24c8e8141cc01889e31"
+    },
+    {
+      "scenario": "trigger_service",
+      "passed": true,
+      "comparison": "exact behavior equality",
+      "ros1_behavior": {
+        "success": true,
+        "message": "validated"
+      },
+      "generated_ros2_behavior": {
+        "success": true,
+        "message": "validated"
+      },
+      "source_sha256": "ee573befe91716dc07af2cc2d489f39146acb46559bd0dc4c2a07a1588ac4e12",
+      "generated_sha256": "45a0565519a46c4496f8926083a7914be4fc29a20b66a686d6b4fafef7d658d0"
+    }
+  ],
+  "limitations": [
+    "This does not validate arbitrary Python, C++, custom interfaces, actionlib, tf, or nodelets.",
+    "TimerEvent contents, simulated time, timing jitter, and global ROS 1 parameter-server semantics are not equivalent.",
+    "The service adapter was exercised only with std_srvs/Trigger and a tuple response.",
+    "Recorded-bag and custom-message corpus validation remain open."
+  ]
+}
